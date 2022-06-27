@@ -28,6 +28,7 @@ Vagrant.configure("2") do |config|
     # Install tons of packages!
     paru --sync --refresh --needed --noconfirm \
       moreutils \
+      python3 \
       exa \
       bat \
       entr \
@@ -59,6 +60,7 @@ Vagrant.configure("2") do |config|
       wl-clipboard \
       otf-font-awesome \
       ly \
+      fish \
       qutebrowser \
       pipewire-jack \
       wireplumber \
@@ -69,13 +71,13 @@ Vagrant.configure("2") do |config|
       ttf-nerd-fonts-symbols \
       sway-launcher-desktop
 
-    # Set default shell to ZSH.
-    sudo chsh vagrant --shell /usr/bin/zsh
+    # Set default shell to fish.
+    sudo chsh vagrant --shell /usr/bin/fish
 
     # Enable ly (TUI-based login manager.)
     sudo systemctl enable ly.service
     sudo systemctl start ly.service
-    
+
     # Set up dotfile symlinks.
     cd /home/vagrant/dotfiles
     stow -v */
@@ -86,6 +88,15 @@ Vagrant.configure("2") do |config|
     podman system migrate
     systemctl --user enable podman.service
     systemctl --user start podman.service
+
+    # Configure my customized VIM IDE environment
+    git clone https://github.com/jairomer/neovim-config.git $HOME/.config/nvim \
+    && cd $HOME/.config/nvim \
+    && git submodule update --init --recursive \
+    && cd $HOME/.config/nvim \
+    && python3 -m pip install --user --upgrade pynvim \
+    && python bundle/YouCompleteMe/install.py
+
   SHELL
 
   # IN PROGRESS
@@ -101,16 +112,4 @@ Vagrant.configure("2") do |config|
     nvm install node
   SHELL
 
-  # TODO
-  #   Fancier clipboard management
-  #   screenshots
-  #   ensure zoom works
-  #   lastpass / password manager
-  #
-  #   Continue configuration for:
-  #     kitty
-  #     zsh
-  #     tmux
-  #     qutebrowser
-  #     neovim
 end
